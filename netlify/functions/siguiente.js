@@ -1,5 +1,3 @@
-const { getStore } = require('@netlify/blobs');
-
 // ─── GRUPOS DE ASESORES ───────────────────────────────────────────────
 const grupos = [
   { nombre: 'Bayron',        url: 'https://chat.whatsapp.com/J0ByT3OtyFCKVWCuBOQ1qU' },
@@ -21,9 +19,16 @@ const grupos = [
   { nombre: 'Natalia',       url: 'https://chat.whatsapp.com/CXJ5VNp2nAj2qp8GpgqyKm' },
 ];
 
-exports.handler = async function (event) {
+exports.handler = async function (event, context) {
+  let nombre, url, metodo;
+
+  // ── Intento 1: contador real en Netlify Blobs (ideal: secuencial exacto) ──
   try {
-    const store = getStore('rotador-ilm');
+    const { getStore } = require('@netlify/blobs');
+    const store = getStore({
+      name: 'rotador-ilm',
+      consistency: 'strong',
+    });
 
     let idx = await store.get('contador', { type: 'json' });
     if (idx === null || idx === undefined || typeof idx !== 'number') {
@@ -31,33 +36,29 @@ exports.handler = async function (event) {
     }
 
     const grupo = grupos[idx % grupos.length];
-
     const siguienteIdx = (idx + 1) % grupos.length;
     await store.setJSON('contador', siguienteIdx);
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
-      },
-      body: JSON.stringify({
-        nombre: grupo.nombre,
-        url: grupo.url,
-      }),
-    };
+    nombre = grupo.nombre;
+    url = grupo.url;
+    metodo = 'blobs';
   } catch (err) {
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
-      },
-      body: JSON.stringify({
-        nombre: grupos[0].nombre,
-        url: grupos[0].url,
-        error: String(err),
-      }),
-    };
+    // ── Fallback: rotación basada en el tiempo del servidor ──
+    const segundosDesdeEpoch = Math.floor(Date.now() / 1000);
+    const idx = Math.floor(segundosDesdeEpoch / 3) % grupos.length;
+    const grupo = grupos[idx];
+
+    nombre = grupo.nombre;
+    url = grupo.url;
+    metodo = 'tiempo-fallback:' + String(err.message || err);
   }
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+    },
+    body: JSON.stringify({ nombre, url, metodo }),
+  };
 };
