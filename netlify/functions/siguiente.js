@@ -1,23 +1,29 @@
-// ─── GRUPOS DE ASESORES (links cortos rebrand.ly) ──────────────────────
-const grupos = [
-  { nombre: 'Bayron',        url: 'https://rebrand.ly/grupobayron' },
-  { nombre: 'Yirley',        url: 'https://rebrand.ly/yirley' },
-  { nombre: 'María Paula',   url: 'https://rebrand.ly/mapaula' },
-  { nombre: 'Stiven M',      url: 'https://rebrand.ly/stivenm' },
-  { nombre: 'Marvin',        url: 'https://rebrand.ly/grupomarvin' },
-  { nombre: 'Stefany',       url: 'https://rebrand.ly/grupostefany' },
-  { nombre: 'Erika Vásquez', url: 'https://rebrand.ly/gruperika' },
-  { nombre: 'Roxana',        url: 'https://rebrand.ly/roxanagrupo' },
-  { nombre: 'Angie',         url: 'https://rebrand.ly/grupangie' },
-  { nombre: 'Valentina',     url: 'https://rebrand.ly/grupovalentina' },
-  { nombre: 'Evelyn',        url: 'https://rebrand.ly/grupevelyn' },
-  { nombre: 'Cristian',      url: 'https://rebrand.ly/grupcristian' },
-  { nombre: 'Andrew',        url: 'https://rebrand.ly/gruoandrew' },
-  { nombre: 'Yuliana',       url: 'https://rebrand.ly/grupyuliana' },
-  { nombre: 'Juan Andrés',   url: 'https://rebrand.ly/grupandres' },
-  { nombre: 'Valeria',       url: 'https://rebrand.ly/grupvaleria' },
-  { nombre: 'Natalia',       url: 'https://rebrand.ly/nataliagrup' },
+// ─── ASESORES (chat directo 1 a 1 con mensaje precargado) ─────────────
+const mensaje = encodeURIComponent('Quiero emprender con tenis y perfumes.');
+
+const asesores = [
+  { nombre: 'Bayron',        numero: '573182245322' },
+  { nombre: 'Yirley',        numero: '573205209764' },
+  { nombre: 'María Paula',   numero: '573183718288' },
+  { nombre: 'Stiven M',      numero: '573204806689' },
+  { nombre: 'Marvin',        numero: '573218148879' },
+  { nombre: 'Stefany',       numero: '573168859774' },
+  { nombre: 'Erika Vásquez', numero: '573023853506' },
+  { nombre: 'Roxana',        numero: '573169100926' },
+  { nombre: 'Angie',         numero: '573159666579' },
+  { nombre: 'Valentina',     numero: '573178811765' },
+  { nombre: 'Evelyn',        numero: '573135233752' },
+  { nombre: 'Cristian',      numero: '573169217805' },
+  { nombre: 'Andrew',        numero: '573218190420' },
+  { nombre: 'Yuliana',       numero: '573115946647' },
+  { nombre: 'Juan Andrés',   numero: '573169990613' },
+  { nombre: 'Valeria',       numero: '573137394278' },
+  { nombre: 'Natalia',       numero: '573103907940' },
 ];
+
+function construirUrl(numero) {
+  return `https://wa.me/${numero}?text=${mensaje}`;
+}
 
 exports.handler = async function (event, context) {
   let nombre, url, metodo;
@@ -35,21 +41,21 @@ exports.handler = async function (event, context) {
       idx = 0;
     }
 
-    const grupo = grupos[idx % grupos.length];
-    const siguienteIdx = (idx + 1) % grupos.length;
+    const asesor = asesores[idx % asesores.length];
+    const siguienteIdx = (idx + 1) % asesores.length;
     await store.setJSON('contador', siguienteIdx);
 
-    nombre = grupo.nombre;
-    url = grupo.url;
+    nombre = asesor.nombre;
+    url = construirUrl(asesor.numero);
     metodo = 'blobs';
   } catch (err) {
     // ── Fallback: rotación basada en el tiempo del servidor ──
     const segundosDesdeEpoch = Math.floor(Date.now() / 1000);
-    const idx = Math.floor(segundosDesdeEpoch / 3) % grupos.length;
-    const grupo = grupos[idx];
+    const idx = Math.floor(segundosDesdeEpoch / 3) % asesores.length;
+    const asesor = asesores[idx];
 
-    nombre = grupo.nombre;
-    url = grupo.url;
+    nombre = asesor.nombre;
+    url = construirUrl(asesor.numero);
     metodo = 'tiempo-fallback:' + String(err.message || err);
   }
 
