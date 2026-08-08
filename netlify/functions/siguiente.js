@@ -1,9 +1,6 @@
-// ─── GRUPOS DE ASESORES ───────────────────────────────────────────────
 const asesores = [
-  { nombre: 'Valeria',       url: 'https://chat.whatsapp.com/HsDlixITf5t3zeCCRQRG8j' },
-  { nombre: 'Cristian',      url: 'https://chat.whatsapp.com/KM9d3OGUbgJL29Fu2fmuz4' },
-  { nombre: 'Erika Vásquez', url: 'https://chat.whatsapp.com/HA4CUZP1uJcHTsj3FIexlr' },
-  { nombre: 'Stefany',       url: 'https://chat.whatsapp.com/FoIKbYL79TvL6pmWCralx5' },
+  { nombre: 'Marvin',   url: 'https://chat.whatsapp.com/FCkk7sUvZAUIeaPkemMopc' },
+  { nombre: 'Stiven M', url: 'https://chat.whatsapp.com/JrCWMcVDWxz42xZ6f2qruU' },
 ];
 
 exports.handler = async function (event, context) {
